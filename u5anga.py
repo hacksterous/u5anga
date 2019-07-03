@@ -57,7 +57,7 @@ class u5anga ():
 		vaara = self.vaara[mp5anga.vaara()] 
 		t = mp5anga.tithi()
 		tithi = self.tithi[t]
-		paksha = "Shukla" if (t) <= 14) else "Krishna"
+		paksha = "Shukla" if (t <= 14) else "Krishna"
 			
 		nakshatra = self.nakshatra[mp5anga.nakshatra()]
 		
