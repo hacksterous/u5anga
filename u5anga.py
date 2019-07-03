@@ -6,6 +6,8 @@ from mpapbf import *
 import gc
 import mp5anga
 from math import *
+gc.enable()
+
 class u5anga ():
 	pi = mpap('3.1415926535897932')
 	pix2 = mpap('6.2831853071795865')
@@ -76,12 +78,9 @@ class u5anga ():
 	def sun (self, dd, mm, yy):
 		#the Julian date
 		t0 = (mpap(mm) - mpap(9)) // mpap(7)
-		gc.collect()
-		t1 = ((mpap(7)) * (mpap(yy) + mpap(5001) + t0)) // 4
-		gc.collect()
+		t1 = ((mpap(7)) * (mpap(yy) + mpap(5001) + t0)) // mpap(4)
 		t2 = (mpap(275) * mpap(mm)) // mpap(9)
 		d = mpap(367) * mpap(yy) - t1 
-		gc.collect()
 		d = d + t2 + mpap(dd) + mpap('1729777')
 		#print ("Julian day to d is ", d)
 
@@ -101,13 +100,11 @@ class u5anga ():
 		#print ("Mean solar day is ", jSTAR)
 
 		#---solar mean anomaly
-		gc.collect()
 		M = ((mpap('357.5291') + mpap('0.98560028') * jSTAR) % 360) * self.D2R
 
 		#---equation of the centre
 		#C is the Equation of the center value needed to calculate lambda (see next equation).
 		#1.9148 is the coefficient of the Equation of the Center for the planet the observer is on (in this case, Earth)
-		gc.collect()
 		C = (mpap('1.9148') * M.sin() + mpap('0.02') * (M * mpap(2)).sin() + mpap('0.0003') * \
 				(M * mpap(3)).sin()) * self.D2R
 		#print ("equation of the centre is", C)
@@ -115,7 +112,6 @@ class u5anga ():
 		#---ecliptic longitude -- lambda
 		#lambdaLong is the ecliptic longitude.
 		#102.9372 is a value for the argument of perihelion.
-		gc.collect()
 		lambdaLong = (M + C + self.pi + mpap('102.9372') * self.D2R) % self.pix2
 		#print ("ecliptic longitude -- lambda is ", lambdaLong)
 
@@ -124,16 +120,13 @@ class u5anga ():
 		#2451545.0 is noon of the equivalent Julian year reference.
 		#mpap(0.0053) * M.sin() - mpap('0.0069') * (lambdaLong * 2).sin() is a 
 		#simplified version of the equation of time. The coefficients are fractional day minutes.
-		gc.collect()
-		jTRANSIT = mpap('2451545') + jSTAR + mpap(0.0053) * M.sin() - mpap('0.0069') * (lambdaLong * 2).sin()
+		jTRANSIT = mpap('2451545') + jSTAR + mpap(0.0053) * M.sin() - mpap('0.0069') * (lambdaLong * mpap(2)).sin()
 		#print ("Julian date for the local true solar transit is ", jTRANSIT)
 
 		#---declination of the sun
 		#delta is the declination of the sun
 		#23.44° is Earth's maximum axial tilt toward the sun
-		gc.collect()
 		sineDelta = lambdaLong.sin() * (mpap('23.44') * self.D2R).sin()
-		gc.collect()
 		delta = mpap(0) #sineDelta.asin()
 		delta = sineDelta.asin()
 		#print ("declination of the sun is", delta)
@@ -141,43 +134,31 @@ class u5anga ():
 		#---elevation correction (elevation is in metres)
 		#This corrects for both apparent dip and terrestrial refraction. 
 		#For example, for an observer at 10,000 feet, add (−115°/60°) or about −1.92° to −0.83°.
-		#gc.collect()
 		elevationCorr = mpap('-2.076') / mpap(60)
-		gc.collect()
 		elevationCorr = elevationCorr * self.Elevation.sqrt() * self.D2R
 		#---hour angle
 		#omega is the hour angle from the observer's zenith;
 		#phi is the north latitude of the observer (north is positive, 
 		#south is negative) on the Earth.
-		gc.collect()
 		phi = self.Latitude * self.D2R
 		#print("north latitude of the observer", phi)
-		gc.collect()
 		cosO = ((mpap('-0.83') * self.D2R + elevationCorr).sin() - phi.sin() * sineDelta)
 		#print("cos0", cosO)
-		gc.collect()
 		cosOmega = cosO / (phi.cos() * delta.cos())
 		#print ("cosine of hour angle from the observer's zenith is", cosOmega)
-		gc.collect()
 		omega = cosOmega.acos()
 		#print ("hour angle from the observer's zenith is", omega)
 
 		#calculate sunrise and sunset times
-		gc.collect()
 		jRISE = jTRANSIT - omega / self.pix2
 		#print ("Rise Time: ", jRISE)
-		gc.collect()
 		jSET  = jTRANSIT + omega / self.pix2
 		#print ("Set Time: ", jSET)
 
-		gc.collect()
 		jNOON = (jSET + jRISE) / mpap(2)
-		gc.collect()
 		dayLightHours = (jSET - jRISE) * mpap(24)
 		#print ("dayLightHours is :", dayLightHours)
-		gc.collect()
 		riseToNoonHrs = (jNOON - jRISE) * mpap(24)
-		gc.collect()
 		noonToSetHrs = mpap(jSET - jNOON) * mpap(24)
 
 		sriseHr = str( mpap(12) - riseToNoonHrs.ceil()) + ':' + ((mpap(1) - riseToNoonHrs.frac()) * 60).roundstr(2)
@@ -274,13 +255,13 @@ class u5anga ():
 		#print ("Set Time: ", jSET)
 
 		jNOON = (jSET + jRISE) / 2
-		dayLightHours = (jSET - jRISE) * 24
+		dayLightHours = mpap((jSET - jRISE) * 24).roundstr(2)
 		#print ("jNOON is :", jNOON)
 		riseToNoonHrs = (jNOON - jRISE) * 24
 		noonToSetHrs = (jSET - jNOON) * 24
 
-		sriseHr = str( 12 - ceil(riseToNoonHrs)) + ':' + str((1 - (riseToNoonHrs - int(riseToNoonHrs))) * 60)
-		ssetHr = str(int(noonToSetHrs) + 12) + ':' + str((noonToSetHrs - int(noonToSetHrs)) * 60)
+		sriseHr = str( 12 - ceil(riseToNoonHrs)) + ':' + mpap(str((1 - (riseToNoonHrs - int(riseToNoonHrs))) * 60)).roundstr(2)
+		ssetHr = str(int(noonToSetHrs) + 12) + ':' + mpap(str((noonToSetHrs - int(noonToSetHrs)) * 60)).roundstr(2)
 		print (" Sunrise at: ", sriseHr)
 		print (" Sunset at: ", ssetHr)
 		print (" Hours of daylight:", dayLightHours)

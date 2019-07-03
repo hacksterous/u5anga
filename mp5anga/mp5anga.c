@@ -109,7 +109,7 @@ floatingpoint mlong(floatingpoint d) {
 	__mp5anga_Mm__ = M;
 	__mp5anga_Lm__ = N+w+M;
 
-	//Calculate Eccentricity anamoly
+	//Calculate Eccentricity anomaly
 	tmp = M*D2R;
 	E = M+R2D*e*sin(tmp)*(1+e*cos(tmp));
 
@@ -238,11 +238,9 @@ STATIC mp_obj_t mp5anga_rashi (void) {
 }
 
 STATIC mp_obj_t mp5anga_vaara (void) {
-	int t1 = (int) floor((__mp5anga_mm__ - 9.0) / 7.0);
-	//unsigned int t2 = (int) floor((__mp5anga_yyyy__ + 5001.0 + t1) / 4.0);
-	unsigned int t2 = (int) floor((7.0 * (__mp5anga_yyyy__ + 5001.0 + floor((__mp5anga_mm__ - 9.0) / 7.0))) / 4.0);
-	unsigned int t3 = (int) floor(275.0 * __mp5anga_mm__ / 9.0);
-	unsigned int d = 367.0 * __mp5anga_yyyy__ - t2 + t3 + __mp5anga_dd__ + 1729777.0;
+	unsigned int t1 = (int) floor((7.0 * (__mp5anga_yyyy__ + 5001.0 + floor((__mp5anga_mm__ - 9.0) / 7.0))) / 4.0);
+	unsigned int t2 = (int) floor(275.0 * __mp5anga_mm__ / 9.0);
+	unsigned int d = 367.0 * __mp5anga_yyyy__ - t1 + t2 + __mp5anga_dd__ + 1729777.0;
 	//printf ("vaara index: %d\n", d%7);
 	//return index to day
 	return mp_obj_new_int(d % 7);
