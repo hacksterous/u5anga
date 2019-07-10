@@ -1,1 +1,2 @@
 # u5anga
+Calculates lunar phases and also the sun rise and set times based on the spreadsheets at Global Monitoring Division, [ESRL](https://www.esrl.noaa.gov/gmd/grad/solcalc/NOAA_Solar_Calculations_year.xls). The calculations now done in single-precision C in a MicroPython external module and are faster on microcontrollers. The error due to single precision is about 0.5 seconds for sun rise and set times.
