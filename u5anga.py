@@ -81,8 +81,10 @@ class u5anga ():
 		sriseHr = mpap(mp5anga.srise (latt, longt))
 		ssetHr = mpap(mp5anga.sset (latt, longt))
 		dayLightHours = mpap(mp5anga.shrs (latt, longt) / 60)
-		print (" Sunrise at: ", str(sriseHr.floor())+":"+ str((sriseHr.frac()*60).roundstr(0)))
-		print (" Sunset at: ", str(ssetHr.floor())+":"+ str((ssetHr.frac()*60).roundstr(0)))
+		minutes = (sriseHr.frac()*60).roundstr(0)
+		print (" Sunrise at: ", (str(sriseHr.floor()+1) if minutes == "60" else str(sriseHr.floor())) + ":" + ("00" if minutes == "60" else minutes))
+		minutes = (ssetHr.frac()*60).roundstr(0)
+		print (" Sunset at : ", (str(ssetHr.floor()+1) if minutes == "60" else str(ssetHr.floor())) + ":" + ("00" if minutes == "60" else minutes))
 		print (" Daylight hours:", str(dayLightHours.floor())+":"+ str((dayLightHours.frac()*60).roundstr(0))+" minutes")
 
 		return

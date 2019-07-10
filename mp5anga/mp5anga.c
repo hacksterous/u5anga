@@ -41,6 +41,10 @@
 #define sqrt MICROPY_FLOAT_C_FUN(sqrt)
 #define floor MICROPY_FLOAT_C_FUN(floor)
 #define atan2 MICROPY_FLOAT_C_FUN(atan2)
+#define fmod MICROPY_FLOAT_C_FUN(fmod)
+#define asin MICROPY_FLOAT_C_FUN(asin)
+#define tan MICROPY_FLOAT_C_FUN(tan)
+#define acos MICROPY_FLOAT_C_FUN(acos)
 #define floatingpoint float
 #else
 #define floatingpoint double
