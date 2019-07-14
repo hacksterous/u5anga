@@ -76,22 +76,33 @@ class u5anga ():
 		return
 
 	def sun (self, dd, mm, yyyy, zhr, latt, longt):
+		if abs(latt) > 65:
+			print ("Error: cannot do latitudes beyond the Arctic/Antarctic Circles")
+			return 0.0
 		mp5anga.set_date(dd, mm, yyyy)
 		mp5anga.set_hour(-1, zhr) #set only time zone
-		sriseHr = mpap(mp5anga.srise (latt, longt))
-		#print ("sun rises: ", sriseHr)
+		sriseHr = mp5anga.srise (latt, longt)
+		#print ("sriseHr: ", sriseHr)
+		sriseHr = mpap(sriseHr)
+		#print ("mpap sriseHr: ", sriseHr)
 		ssetHr = mpap(mp5anga.sset (latt, longt))
 		#print ("sun sets: ", ssetHr)
 		dayLightHours = mpap(mp5anga.shrs (latt, longt) / 60)
 		#print ("sun rises fracx60: ", sriseHr.frac()*60)
 		minutes = (sriseHr.frac()*60).roundstr(0)
+		#print ("minutes: ", minutes)
 		if len(minutes) == 1:
 			minutes = '0' + minutes
 		#print ("sun rises fracx60 roundstr0: ", (sriseHr.frac()*60).roundstr(0))
 		print (" Sunrise at: ", (str(sriseHr.floor()+1) if minutes == "60" else str(sriseHr.floor())) + ":" + ("00" if minutes == "60" else minutes))
 		minutes = (ssetHr.frac()*60).roundstr(0)
+		if len(minutes) == 1:
+			minutes = '0' + minutes
 		print (" Sunset at : ", (str(ssetHr.floor()+1) if minutes == "60" else str(ssetHr.floor())) + ":" + ("00" if minutes == "60" else minutes))
-		print (" Daylight hours:", str(dayLightHours.floor())+":"+ str((dayLightHours.frac()*60).roundstr(0))+" minutes")
+		minutes = (dayLightHours.frac()*60).roundstr(0)
+		if len(minutes) == 1:
+			minutes = '0' + minutes
+		print (" Daylight hours:", str(dayLightHours.floor())+":"+ ("00" if minutes == "60" else minutes) +" minutes")
 
-		return
+		return sriseHr.float()
 
