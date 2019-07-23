@@ -81,9 +81,8 @@ class u5anga ():
 			return 0.0
 		mp5anga.set_date(dd, mm, yyyy)
 		mp5anga.set_hour(-1, zhr) #set only time zone
-		sriseHr = mp5anga.srise (latt, longt)
 		#print ("sriseHr: ", sriseHr)
-		sriseHr = mpap(sriseHr)
+		sriseHr = mpap(mp5anga.srise (latt, longt))
 		#print ("mpap sriseHr: ", sriseHr)
 		ssetHr = mpap(mp5anga.sset (latt, longt))
 		#print ("sun sets: ", ssetHr)
