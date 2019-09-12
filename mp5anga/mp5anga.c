@@ -392,12 +392,13 @@ STATIC mp_obj_t mp5anga_rashi (void) {
 }
 
 STATIC mp_obj_t mp5anga_vaara (void) {
-	unsigned int t1 = (int) floor((7.0 * (__mp5anga_yyyy__ + 5001.0 + floor((__mp5anga_mm__ - 9.0) / 7.0))) / 4.0);
-	unsigned int t2 = (int) floor(275.0 * __mp5anga_mm__ / 9.0);
-	unsigned int d = 367.0 * __mp5anga_yyyy__ - t1 + t2 + __mp5anga_dd__ + 1729777.0;
-	//printf ("vaara index: %d\n", d%7);
+	//unsigned int t1 = (int) floor((7.0 * (__mp5anga_yyyy__ + 5001.0 + floor((__mp5anga_mm__ - 9.0) / 7.0))) / 4.0);
+	//unsigned int t2 = (int) floor(275.0 * __mp5anga_mm__ / 9.0);
+	//unsigned int d = 367.0 * __mp5anga_yyyy__ - t1 + t2 + __mp5anga_dd__ + 1729777.0; // --- bug!
+	unsigned int d = datenum (__mp5anga_dd__, __mp5anga_mm__, __mp5anga_yyyy__, 12, 0);
+	//printf ("vaara index: %d\n", (d+5)%7);
 	//return index to day
-	return mp_obj_new_int(d % 7);
+	return mp_obj_new_int((d+5) % 7);
 }
 
 STATIC mp_obj_t mp5anga_srise (mp_obj_t olat, mp_obj_t olong) {
