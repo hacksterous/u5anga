@@ -391,7 +391,7 @@ void calculate_tithi(int dd, int mm, int yy, double hr, double zhr, panchanga *p
 	double mlon =  rev(atan2d(yeclip, xeclip));
     //double latt  =  rev(atan2(zeclip, sqrt( xeclip*xeclip + yeclip*yeclip)));
     //r =  sqrt(xeclip*xeclip + yeclip*yeclip + zeclip*zeclip);
-	printf ("moon_long: Moon's longt is %f\n", mlon);
+	//printf ("moon_long: Moon's longt is %f\n", mlon);
 
 	//Compensate for Moon's perturbations
     //Sun's  mean longitude:        Ls     (already computed as Ls)
@@ -411,6 +411,7 @@ void calculate_tithi(int dd, int mm, int yy, double hr, double zhr, panchanga *p
 	//printf ("moon_long: Moon's mean longitude Lm is %f\n", Lm);
 	//printf ("moon_long: Moon's argument of latitude F is %f\n", F);
 
+	printf ("moon_long: Moon's longt before perturb fix is %f\n", mlon);
 	mlon += 
 		-1.274 * sind(Mm - 2*D)		//Evection
 		+0.658 * sind(2*D)			//Variation
@@ -426,7 +427,7 @@ void calculate_tithi(int dd, int mm, int yy, double hr, double zhr, panchanga *p
 		+0.011 * sind(Mm - 4*D);
 	mlon = rev(mlon);
 	//printf ("Sun's longitude = %.8f\n", slon);
-	//printf ("moon_long: Moon's longt after perturb fix is %f\n", mlon);
+	printf ("moon_long: Moon's longt after perturb fix is %f\n", mlon);
 
 	int n;
 
@@ -504,7 +505,6 @@ void calculate_tithi_radians(int dd, int mm, int yy, double hr, double zhr, panc
 	double mlon =  atan2(yeclip, xeclip);
     //double latt  =  atan2(zeclip, sqrt( xeclip*xeclip + yeclip*yeclip));
     //r =  sqrt(xeclip*xeclip + yeclip*yeclip + zeclip*zeclip);
-	printf ("moon_long: Moon's longt is %f\n", mlon);
 
 	//Compensate for Moon's perturbations
     //Sun's  mean longitude:        Ls     (already computed as Ls)
@@ -524,6 +524,8 @@ void calculate_tithi_radians(int dd, int mm, int yy, double hr, double zhr, panc
 	//printf ("moon_long: Moon's mean longitude Lm is %f\n", Lm);
 	//printf ("moon_long: Moon's argument of latitude F is %f\n", F);
 
+	printf ("moon_long: Moon's longt before perturb fix in radians is %f\n", mlon);
+	printf ("moon_long: Moon's longt before perturb fix is %f\n", rev(degrees(mlon)));
 	mlon += 
 		-1.274 * sin(Mm - 2*D)		//Evection
 		+0.658 * sin(2*D)			//Variation
@@ -537,9 +539,11 @@ void calculate_tithi_radians(int dd, int mm, int yy, double hr, double zhr, panc
 		-0.031 * sin(Mm + Ms)
 		-0.015 * sin(2*F - 2*D)
 		+0.011 * sin(Mm - 4*D);
-	mlon = degrees(mlon);
+	printf ("moon_long: Moon's longt after perturb fix in radians is %f\n", mlon);
+
+	mlon = rev(degrees(mlon));
 	//printf ("Sun's longitude = %.8f\n", slon);
-	//printf ("moon_long: Moon's longt after perturb fix is %f\n", mlon);
+	printf ("moon_long: Moon's longt after perturb fix is %f\n", mlon);
 
 	int n;
 

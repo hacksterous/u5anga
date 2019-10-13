@@ -1,0 +1,141 @@
+1,   1 ,  04,  6 ,  21,   AM, 10,   Dashami    , Shukla    paksha
+1,   2 ,  04,  8 ,  52,   AM, 11,   Ekadashi   , Shukla    paksha
+1,   3 ,  04,  11,  37,   AM, 12,   Dvadashi   , Shukla    paksha
+1,   4 ,  04,  2 ,  23,   PM, 13,   Trayodashi , Shukla    paksha
+1,   5 ,  04,  4 ,  58,   PM, 14,   Chaturdashi, Shukla    paksha
+1,   6 ,  04,  7 ,  15,   PM, 15,   Purnima    , Shukla    paksha
+1,   7 ,  04,  9 ,  10,   PM, 1 ,   Pratipat   , Krishna    paksha
+1,   8 ,  04,  10,  39,   PM, 2 ,   Dvitiya    , Krishna    paksha
+1,   9 ,  04,  11,  43,   PM, 3 ,   Tritiya    , Krishna    paksha
+1,   11,  04,  12,  23,   AM, 4 ,   Chaturthi  , Krishna    paksha
+1,   12,  04,  12,  38,   AM, 5 ,   Panchami   , Krishna    paksha
+1,   13,  04,  12,  29,   AM, 6 ,   Shashti    , Krishna    paksha
+1,   13,  04,  11,  55,   PM, 7 ,   Saptami    , Krishna    paksha
+1,   14,  04,  10,  55,   PM, 8 ,   Ashtami    , Krishna    paksha
+1,   15,  04,  9 ,  28,   PM, 9 ,   Navami     , Krishna    paksha
+1,   16,  04,  7 ,  35,   PM, 10,   Dashami    , Krishna    paksha
+1,   17,  04,  5 ,  17,   PM, 11,   Ekadashi   , Krishna    paksha
+1,   18,  04,  2 ,  38,   PM, 12,   Dvadashi   , Krishna    paksha
+1,   19,  04,  11,  42,   AM, 13,   Trayodashi , Krishna    paksha
+1,   20,  04,  8 ,  37,   AM, 14,   Chaturdashi, Krishna    paksha
+1,   21,  04,  5 ,  31,   AM, 15,   Amavasya   , Krishna    paksha
+1,   22,  04,  2 ,  34,   AM, 1 ,   Pratipat   , Shukla    paksha
+1,   22,  04,  11,  57,   PM, 2 ,   Dvitiya    , Shukla    paksha
+1,   23,  04,  9 ,  48,   PM, 3 ,   Tritiya    , Shukla    paksha
+1,   24,  04,  8 ,  19,   PM, 4 ,   Chaturthi  , Shukla    paksha
+1,   25,  04,  7 ,  36,   PM, 5 ,   Panchami   , Shukla    paksha
+1,   26,  04,  7 ,  44,   PM, 6 ,   Shashti    , Shukla    paksha
+1,   27,  04,  8 ,  42,   PM, 7 ,   Saptami    , Shukla    paksha
+1,   28,  04,  10,  27,   PM, 8 ,   Ashtami    , Shukla    paksha
+1,   30,  04,  12,  46,   AM, 9 ,   Navami     , Shukla    paksha
+1,   31,  04,  3 ,  26,   AM, 10,   Dashami    , Shukla    paksha
+2,   1 ,  04,  6 ,  10,   AM, 11,   Ekadashi   , Shukla    paksha
+2,   2 ,  04,  8 ,  43,   AM, 12,   Dvadashi   , Shukla    paksha
+2,   3 ,  04,  10,  53,   AM, 13,   Trayodashi , Shukla    paksha
+2,   4 ,  04,  12,  34,   PM, 14,   Chaturdashi, Shukla    paksha
+2,   5 ,  04,  1 ,  41,   PM, 15,   Purnima    , Shukla    paksha
+2,   6 ,  04,  2 ,  16,   PM, 1 ,   Pratipat   , Krishna    paksha
+2,   7 ,  04,  2 ,  22,   PM, 2 ,   Dvitiya    , Krishna    paksha
+2,   8 ,  04,  2 ,  03,   PM, 3 ,   Tritiya    , Krishna    paksha
+2,   9 ,  04,  1 ,  23,   PM, 4 ,   Chaturthi  , Krishna    paksha
+2,   10,  04,  12,  25,   PM, 5 ,   Panchami   , Krishna    paksha
+2,   11,  04,  11,  12,   AM, 6 ,   Shashti    , Krishna    paksha
+2,   12,  04,  9 ,  45,   AM, 7 ,   Saptami    , Krishna    paksha
+2,   13,  04,  8 ,  04,   AM, 8 ,   Ashtami    , Krishna    paksha
+2,   14,  04,  6 ,  11,   AM, 9 ,   Navami     , Krishna    paksha
+2,   15,  04,  4 ,  05,   AM, 10,   Dashami    , Krishna    paksha
+2,   16,  04,  1 ,  50,   AM, 11,   Ekadashi   , Krishna    paksha
+2,   16,  04,  11,  27,   PM, 12,   Dvadashi   , Krishna    paksha
+2,   17,  04,  9 ,  03,   PM, 13,   Trayodashi , Krishna    paksha
+2,   18,  04,  6 ,  43,   PM, 14,   Chaturdashi, Krishna    paksha
+2,   19,  04,  4 ,  35,   PM, 15,   Amavasya   , Krishna    paksha
+2,   20,  04,  2 ,  47,   PM, 1 ,   Pratipat   , Shukla    paksha
+2,   21,  04,  1 ,  28,   PM, 2 ,   Dvitiya    , Shukla    paksha
+2,   22,  04,  12,  46,   PM, 3 ,   Tritiya    , Shukla    paksha
+2,   23,  04,  12,  46,   PM, 4 ,   Chaturthi  , Shukla    paksha
+2,   24,  04,  1 ,  31,   PM, 5 ,   Panchami   , Shukla    paksha
+2,   25,  04,  2 ,  59,   PM, 6 ,   Shashti    , Shukla    paksha
+2,   26,  04,  5 ,  04,   PM, 7 ,   Saptami    , Shukla    paksha
+2,   27,  04,  7 ,  34,   PM, 8 ,   Ashtami    , Shukla    paksha
+2,   28,  04,  10,  13,   PM, 9 ,   Navami     , Shukla    paksha
+3,   1 ,  04,  12,  46,   AM, 10,   Dashami    , Shukla    paksha
+3,   2 ,  04,  2 ,  57,   AM, 11,   Ekadashi   , Shukla    paksha
+3,   3 ,  04,  4 ,  35,   AM, 12,   Dvadashi   , Shukla    paksha
+3,   4 ,  04,  5 ,  34,   AM, 13,   Trayodashi , Shukla    paksha
+3,   5 ,  04,  5 ,  54,   AM, 14,   Chaturdashi, Shukla    paksha
+3,   6 ,  04,  5 ,  35,   AM, 15,   Purnima    , Shukla    paksha
+3,   7 ,  04,  4 ,  44,   AM, 1 ,   Pratipat   , Krishna    paksha
+3,   8 ,  04,  3 ,  26,   AM, 2 ,   Dvitiya    , Krishna    paksha
+3,   9 ,  04,  1 ,  47,   AM, 3 ,   Tritiya    , Krishna    paksha
+3,   9 ,  04,  11,  54,   PM, 4 ,   Chaturthi  , Krishna    paksha
+3,   10,  04,  9 ,  53,   PM, 5 ,   Panchami   , Krishna    paksha
+3,   11,  04,  7 ,  47,   PM, 6 ,   Shashti    , Krishna    paksha
+3,   12,  04,  5 ,  39,   PM, 7 ,   Saptami    , Krishna    paksha
+3,   13,  04,  3 ,  33,   PM, 8 ,   Ashtami    , Krishna    paksha
+3,   14,  04,  1 ,  29,   PM, 9 ,   Navami     , Krishna    paksha
+3,   15,  04,  11,  30,   AM, 10,   Dashami    , Krishna    paksha
+3,   16,  04,  9 ,  38,   AM, 11,   Ekadashi   , Krishna    paksha
+3,   17,  04,  7 ,  55,   AM, 12,   Dvadashi   , Krishna    paksha
+3,   18,  04,  6 ,  27,   AM, 13,   Trayodashi , Krishna    paksha
+3,   19,  04,  5 ,  16,   AM, 14,   Chaturdashi, Krishna    paksha
+3,   20,  04,  4 ,  29,   AM, 15,   Amavasya   , Krishna    paksha
+3,   21,  04,  4 ,  11,   AM, 1 ,   Pratipat   , Shukla    paksha
+3,   22,  04,  4 ,  25,   AM, 2 ,   Dvitiya    , Shukla    paksha
+3,   23,  04,  5 ,  15,   AM, 3 ,   Tritiya    , Shukla    paksha
+3,   24,  04,  6 ,  40,   AM, 4 ,   Chaturthi  , Shukla    paksha
+3,   25,  04,  8 ,  37,   AM, 5 ,   Panchami   , Shukla    paksha
+3,   26,  04,  10,  59,   AM, 6 ,   Shashti    , Shukla    paksha
+3,   27,  04,  1 ,  33,   PM, 7 ,   Saptami    , Shukla    paksha
+3,   28,  04,  4 ,  06,   PM, 8 ,   Ashtami    , Shukla    paksha
+3,   29,  04,  6 ,  23,   PM, 9 ,   Navami     , Shukla    paksha
+3,   30,  04,  8 ,  10,   PM, 10,   Dashami    , Shukla    paksha
+3,   31,  04,  9 ,  19,   PM, 11,   Ekadashi   , Shukla    paksha
+4,   1 ,  04,  9 ,  43,   PM, 12,   Dvadashi   , Shukla    paksha
+4,   2 ,  04,  9 ,  22,   PM, 13,   Trayodashi , Shukla    paksha
+4,   3 ,  04,  8 ,  20,   PM, 14,   Chaturdashi, Shukla    paksha
+4,   4 ,  04,  6 ,  41,   PM, 15,   Purnima    , Shukla    paksha
+4,   5 ,  04,  4 ,  32,   PM, 1 ,   Pratipat   , Krishna    paksha
+4,   6 ,  04,  2 ,  02,   PM, 2 ,   Dvitiya    , Krishna    paksha
+4,   7 ,  04,  11,  18,   AM, 3 ,   Tritiya    , Krishna    paksha
+4,   8 ,  04,  8 ,  29,   AM, 4 ,   Chaturthi  , Krishna    paksha
+4,   9 ,  04,  5 ,  40,   AM, 5 ,   Panchami   , Krishna    paksha
+4,   10,  04,  2 ,  58,   AM, 6 ,   Shashti    , Krishna    paksha
+4,   11,  04,  12,  28,   AM, 7 ,   Saptami    , Krishna    paksha
+4,   11,  04,  10,  15,   PM, 8 ,   Ashtami    , Krishna    paksha
+4,   12,  04,  8 ,  21,   PM, 9 ,   Navami     , Krishna    paksha
+4,   13,  04,  6 ,  50,   PM, 10,   Dashami    , Krishna    paksha
+4,   14,  04,  5 ,  43,   PM, 11,   Ekadashi   , Krishna    paksha
+4,   15,  04,  5 ,  02,   PM, 12,   Dvadashi   , Krishna    paksha
+4,   16,  04,  4 ,  47,   PM, 13,   Trayodashi , Krishna    paksha
+4,   17,  04,  5 ,  00,   PM, 14,   Chaturdashi, Krishna    paksha
+4,   18,  04,  5 ,  41,   PM, 15,   Amavasya   , Krishna    paksha
+4,   19,  04,  6 ,  51,   PM, 1 ,   Pratipat   , Shukla    paksha
+4,   20,  04,  8 ,  27,   PM, 2 ,   Dvitiya    , Shukla    paksha
+4,   21,  04,  10,  27,   PM, 3 ,   Tritiya    , Shukla    paksha
+4,   23,  04,  12,  47,   AM, 4 ,   Chaturthi  , Shukla    paksha
+4,   24,  04,  3 ,  18,   AM, 5 ,   Panchami   , Shukla    paksha
+4,   25,  04,  5 ,  51,   AM, 6 ,   Shashti    , Shukla    paksha
+4,   26,  04,  8 ,  14,   AM, 7 ,   Saptami    , Shukla    paksha
+4,   27,  04,  10,  14,   AM, 8 ,   Ashtami    , Shukla    paksha
+4,   28,  04,  11,  41,   AM, 9 ,   Navami     , Shukla    paksha
+4,   29,  04,  12,  26,   PM, 10,   Dashami    , Shukla    paksha
+4,   30,  04,  12,  26,   PM, 11,   Ekadashi   , Shukla    paksha
+5,   1 ,  04,  11,  38,   AM, 12,   Dvadashi   , Shukla    paksha
+5,   2 ,  04,  10,  06,   AM, 13,   Trayodashi , Shukla    paksha
+5,   3 ,  04,  7 ,  54,   AM, 14,   Chaturdashi, Shukla    paksha
+5,   4 ,  04,  5 ,  11,   AM, 15,   Purnima    , Shukla    paksha
+5,   5 ,  04,  2 ,  03,   AM, 1 ,   Pratipat   , Krishna    paksha
+5,   5 ,  04,  10,  40,   PM, 2 ,   Dvitiya    , Krishna    paksha
+5,   6 ,  04,  7 ,  12,   PM, 3 ,   Tritiya    , Krishna    paksha
+5,   7 ,  04,  3 ,  46,   PM, 4 ,   Chaturthi  , Krishna    paksha
+5,   8 ,  04,  12,  33,   PM, 5 ,   Panchami   , Krishna    paksha
+5,   9 ,  04,  9 ,  39,   AM, 6 ,   Shashti    , Krishna    paksha
+5,   10,  04,  7 ,  12,   AM, 7 ,   Saptami    , Krishna    paksha
+5,   11,  04,  5 ,  18,   AM, 8 ,   Ashtami    , Krishna    paksha
+5,   12,  04,  3 ,  59,   AM, 9 ,   Navami     , Krishna    paksha
+5,   13,  04,  3 ,  17,   AM, 10,   Dashami    , Krishna    paksha
+5,   14,  04,  3 ,  13,   AM, 11,   Ekadashi   , Krishna    paksha
+5,   15,  04,  3 ,  44,   AM, 12,   Dvadashi   , Krishna    paksha
+5,   16,  04,  4 ,  47,   AM, 13,   Trayodashi , Krishna    paksha
+5,   17,  04,  6 ,  17,   AM, 14,   Chaturdashi, Krishna    paksha
+5,   18,  04,  8 ,  10,   AM, 15,   Amavasya   , Krishna    paksha
