@@ -78,31 +78,6 @@ double rev(double x) {
     return  x - floor(x/360.0)*360.0;
 }
 
-double datenum(	int day, 
-				int mon, 
-				int year, 
-				int hour, 
-				int min, 
-				int sec) {
-	int tmp1, tmp2, tmp3;
-	double	tmp4, tmp5;
-	double dNum;
-	int cumudays[] = {0, 0,31,59,90,120,151,181,212,243,273,304,334};
-	/* Calculate the serial date number:*/
-	tmp1 = 365 * year  + cumudays[mon] + day;
-	tmp2 = year / 4 - year / 100 + year / 400;
-	tmp3 = (year % 4 != 0) - (year % 100 != 0) + (year % 400 != 0);
-	tmp4 = (double) (tmp1+tmp2+tmp3);
-	tmp5 = (hour * 3600 + min * 60 + sec) / 86400.0;
-	dNum = tmp4 + tmp5;
-	if (mon > 2) {
-		if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
-			dNum += 1.0;
-		}
-	}
-	return (dNum);
-}
-
 double timescale(int dd, 
 				int mm, 
 				int yy, 
@@ -171,61 +146,6 @@ double JulianDay (int date, int month, int year, double hr, double zhr) {
 			floor(30.6001*(month+1)) + 1720996.5 + date + (hr - zhr)/24.0;
 }
 
-double JulianDay2 (int dd, 
-			int mm, 
-			int yyyy, 
-			double hr,
-			double zhr) {
-
-	//NOTE: deltaT of 65 seconds (=0.018055555555556hr) has not been added to hr
-	double day = datenum (dd, mm, yyyy, 0, 0, 0) - 
-							datenum (30, 12, 1899, 0, 0, 0);
-	//printf ("A: day is %.15f\n", day);
-
-	//const double E = 0.5; //always calculate at noon = 12 hours from local midnight
-	double E = hr/24.0;
-
-	double julian_day = day + 2415018.5 + E - (zhr/24.0);
-	//printf ("B: JulianDay2 is %.15f\n", julian_day);
-
-	return julian_day;
-	
-}
-
-//Modified Julian Day
-double ModifiedJulianDay (int dd, int mm, int yy, double h, double z) {
-	//http://www.stargazing.net/kepler/riset.bas
-	//returns modified julian date = Julian Day - 2400000.5
-	//number of days since 1858 Nov 17 00:00h
-	//valid for any date since 4713 BC
-	//assumes gregorian calendar after 1582 Oct 15, Julian before
-	//Years BC assumed in calendar format, i.e. the year before 1 AD is 1 BC
-	int d = dd;
-	int m = mm;
-	int y = yy;
-	double b;
-	double a = 10000.0 * y + 100.0 * m + d;
-	//printf ("------ModifiedJulianDay: b is %.15f\n", b);
-
-	if (y < 0)
-		y = y + 1;
-	if (m <= 2) {
-		m = m + 12;
-		y = y - 1;
-	}
-	if (a <= 15821004.1)
-	   b = -2 + ipart((y + 4716) / 4) - 1179;
-	else
-	   b = ipart(y / 400) - ipart(y / 100) + ipart(y / 4);
-	//printf ("------ModifiedJulianDay: b is %.15f\n", b);
-	a = 365.0 * y - 679004.0;
-	a = a + b + ipart(30.6001 * (m + 1)) + d + (h/24) - (z/24);
-	//NOTE: deltaT of 65 seconds (=0.018055555555556hr) has not been added to hr
-	//printf("Modified Julian Day = %.15f\n", a);
-	//printf("Julian Day 3 = %.15f\n", a+2400000.5);
-	return (a);
-}
-
 double sun_esrl (double* sunriseLSTp, 
 			double* sunsetLSTp, 
 			int dd, 
@@ -233,17 +153,14 @@ double sun_esrl (double* sunriseLSTp,
 			int yyyy, 
 			double zhr, 
 			double latt, 
-			double longt, int altfn) {
+			double longt) {
 
 	// Reverse engineered from the NOAA Excel:
 	//https://www.esrl.noaa.gov/gmd/grad/solcalc/calcdetails.html
 
 	double julian_day;
-	if (altfn)
-		julian_day = JulianDay (dd, mm, yyyy, 12.0, zhr);
-	else
-		julian_day = JulianDay2 (dd, mm, yyyy, 12.0, zhr);
-	printf ("sun_esrl: julian_day is %.15f\n", julian_day);
+	julian_day = JulianDay (dd, mm, yyyy, 12.0, zhr);
+	//printf ("sun_esrl: julian_day is %.15f\n", julian_day);
 
 	double julian_century = (julian_day - 2451545.0)/36525.0; //G
 	//printf ("julian_century is %.15f\n", julian_century);
@@ -327,8 +244,14 @@ double sun_esrl (double* sunriseLSTp,
 	return (sunlight_duration_min);
 }
 
+double nround(double x, unsigned int n) {
+    double fac = pow(10, n);
+    return round(x*fac)/fac;
+}
+
 void calculate_tithi(int dd, int mm, int yy, double hr, double zhr, panchanga *pdata) {
 	//https://www.stjarnhimlen.se/comp/tutorial.html#7
+	//and also https://stjarnhimlen.se/comp/ppcomp.html
 	double d = timescale (dd, mm, yy, hr, zhr);
 
 	//------------------------------Sun
@@ -352,14 +275,14 @@ void calculate_tithi(int dd, int mm, int yy, double hr, double zhr, panchanga *p
 	//distance from Sun and true anomaly
 	//double r = sqrt(x*x + y*y);	//in Earth radii
     double v = atan2d( y, x );	//true anomaly
-	double slon = rev(v + w);
-	printf ("Sun's longitude = %.8f\n", slon);
+	double slon = (v + w);
+	//printf ("Sun's longitude = %.8f\n", slon);
 
 	//------------------------------Moon
 	//all below are in degrees
 	double N = rev(125.1228 - 0.0529538083  * d);   //Longt of ascending node
     const double i = 5.1454;						//Inclination
-    w = rev(318.0634 + 0.1643573223  * d);   //Arg. of perigee
+    w = rev(318.0634 + 0.1643573223  * d);			//Arg. of perigee
     double Mm = rev(115.3654 + 13.0649929509 * d);  //Mean eccentricity anomaly
 
     const double a = 60.2666; //Mean distance in Earth equatorial radii
@@ -371,7 +294,7 @@ void calculate_tithi(int dd, int mm, int yy, double hr, double zhr, panchanga *p
 	do {
 		eps	= (E - (180/PI) * e * sind(E) - Mm) / (1 - e * cosd(E));
 		E = E - eps;
-	} while (eps > 0.005 || eps < -0.005);
+	} while (eps > 0.001 || eps < -0.001);
 	//compute rectangular (x,y) coordinates in the plane of the lunar orbit
 	x = a * (cosd(E) - e);
     y = a * sqrt(1 - e*e) * sind(E);
@@ -388,7 +311,7 @@ void calculate_tithi(int dd, int mm, int yy, double hr, double zhr, panchanga *p
 	//printf ("Moon yeclip = %.8f\n", yeclip);
 	//printf ("Moon zeclip = %.8f\n", zeclip);
 
-	double mlon =  rev(atan2d(yeclip, xeclip));
+	double mlon =  (atan2d(yeclip, xeclip));
     //double latt  =  rev(atan2(zeclip, sqrt( xeclip*xeclip + yeclip*yeclip)));
     //r =  sqrt(xeclip*xeclip + yeclip*yeclip + zeclip*zeclip);
 	//printf ("moon_long: Moon's longt is %f\n", mlon);
@@ -411,7 +334,7 @@ void calculate_tithi(int dd, int mm, int yy, double hr, double zhr, panchanga *p
 	//printf ("moon_long: Moon's mean longitude Lm is %f\n", Lm);
 	//printf ("moon_long: Moon's argument of latitude F is %f\n", F);
 
-	printf ("moon_long: Moon's longt before perturb fix is %f\n", mlon);
+	//printf ("moon_long: Moon's longt before perturb fix is %f\n", mlon);
 	mlon += 
 		-1.274 * sind(Mm - 2*D)		//Evection
 		+0.658 * sind(2*D)			//Variation
@@ -421,23 +344,30 @@ void calculate_tithi(int dd, int mm, int yy, double hr, double zhr, panchanga *p
 		+0.053 * sind(Mm + 2*D)
 		+0.046 * sind(2*D - Ms)
 		+0.041 * sind(Mm - Ms)
-		-0.035 * sind(D)			//Parallactic equation
+		-0.035 * sind(D)			//Parallactic equation -- should be -0.0375
+		-0.0025 * sind(D)			//Parallactic equation -- new term
+									//anirb's term actual val from https://en.wikipedia.org/wiki/Lunar_theory
+									//is 125" = 0.0375 degrees
 		-0.031 * sind(Mm + Ms)
-		-0.015 * sind(2*F - 2*D)
+		-0.0144 * sind(2*F - 2*D)   //reduction to the ecliptic was 0.015
 		+0.011 * sind(Mm - 4*D);
-	mlon = rev(mlon);
 	//printf ("Sun's longitude = %.8f\n", slon);
-	printf ("moon_long: Moon's longt after perturb fix is %f\n", mlon);
+	//printf ("moon_long: Moon's longt after perturb fix is %f\n", mlon);
 
 	int n;
 
 	//Calculate Tithi and Paksha
-	if (mlon<slon)
+	//printf ("Diff between Moons and Sun's longitudes = %.8f\n", mlon - slon);
+	//printf ("Index of diff between Moons and Sun's longitudes = %.8f\n", (mlon - slon)/12.0);
+	if (mlon<slon) {
 		mlon += 360.0;
-	printf ("Diff between Moons and Sun's longitudes = %.8f\n", mlon - slon);
-	n = (int) (((mlon-slon)/12.0) + 0.0025);
+		n = (int) (nround((rev(mlon-slon+0.07)/12.0), 3));
+	} else
+		n = (int) (nround((rev(mlon-slon)/12.0), 3));
 	strcpy(pdata->tithi,__g_tithi[n]);
-	printf ("Tithi index is n= %d -- %s\n", n, __g_tithi[n]);
+	//printf ("Tithi index is n= %d -- %s\n", n, __g_tithi[n]);
+	printf ("%s\n", __g_tithi[n]);
+	//printf ("%f\n", nround(rev(mlon-slon+0.06)/12.0, 3));
 	(n<=14)?strcpy(pdata->paksha,"Shukla"):strcpy(pdata->paksha,"Krishna");
 }
 
@@ -465,9 +395,9 @@ void calculate_tithi_radians(int dd, int mm, int yy, double hr, double zhr, panc
 
 	//distance from Sun and true anomaly
 	//double r = sqrt(x*x + y*y);	//in Earth radii
-    double v = atan2( y, x );	//true anomaly
+    double v = atan2( y, x );		//true anomaly
 	double slon = v + w;
-	printf ("Sun's longitude = %.8f\n", rev(degrees(slon)));
+	//printf ("Sun's longitude = %.8f\n", rev(degrees(slon)));
 
 	//------------------------------Moon
 	//all below are in radians
@@ -485,7 +415,7 @@ void calculate_tithi_radians(int dd, int mm, int yy, double hr, double zhr, panc
 	do {
 		eps	= (E - e * sin(E) - Mm) / (1 - e * cos(E));
 		E = E - eps;
-	} while (eps > 0.005 || eps < -0.005);
+	} while (eps > 0.001 || eps < -0.001);
 	//compute rectangular (x,y) coordinates in the plane of the lunar orbit
 	x = a * (cos(E) - e);
     y = a * sqrt(1 - e*e) * sin(E);
@@ -524,36 +454,44 @@ void calculate_tithi_radians(int dd, int mm, int yy, double hr, double zhr, panc
 	//printf ("moon_long: Moon's mean longitude Lm is %f\n", Lm);
 	//printf ("moon_long: Moon's argument of latitude F is %f\n", F);
 
-	printf ("moon_long: Moon's longt before perturb fix in radians is %f\n", mlon);
-	printf ("moon_long: Moon's longt before perturb fix is %f\n", rev(degrees(mlon)));
-	mlon += 
-		-1.274 * sin(Mm - 2*D)		//Evection
-		+0.658 * sin(2*D)			//Variation
-		-0.186 * sin(Ms)			//Yearly equation
-		-0.059 * sin(2*Mm - 2*D)
-		-0.057 * sin(Mm - 2*D + Ms)
-		+0.053 * sin(Mm + 2*D)
-		+0.046 * sin(2*D - Ms)
-		+0.041 * sin(Mm - Ms)
-		-0.035 * sin(D)			//Parallactic equation
-		-0.031 * sin(Mm + Ms)
-		-0.015 * sin(2*F - 2*D)
-		+0.011 * sin(Mm - 4*D);
-	printf ("moon_long: Moon's longt after perturb fix in radians is %f\n", mlon);
+	//printf ("moon_long: Moon's longt before perturb fix in radians is %f\n", mlon);
+	//printf ("moon_long: Moon's longt before perturb fix is %f\n", rev(degrees(mlon)));
+	mlon += //in radians
+		-0.022235495 * sin(Mm - 2*D)	//Evection
+		+0.011484266 * sin(2*D)			//Variation
+		-0.003246312 * sin(Ms)			//Yearly equation
+		-0.001029744 * sin(2*Mm - 2*D)
+		-0.000994838 * sin(Mm - 2*D + Ms)
+		+0.000925025 * sin(Mm + 2*D)
+		+0.000802851 * sin(2*D - Ms)
+		+0.000715585 * sin(Mm - Ms)
+		-0.000610865 * sin(D)			//Parallactic equation
+		-4.3633231292e-5 * sin(D)		//Parallactic equation -- new term
+										//anirb's term actual val from https://en.wikipedia.org/wiki/Lunar_theory
+										//is 125" = 0.0375 degrees
+		-0.000541052 * sin(Mm + Ms)
+		-0.0002513274 * sin(2*F - 2*D)	//reduction to the ecliptic was 0.000261799    
+		+0.000191986 * sin(Mm - 4*D);
+	//printf ("moon_long: Moon's longt after perturb fix in radians is %f\n", mlon);
 
-	mlon = rev(degrees(mlon));
+	slon = (degrees(slon));
+	mlon = (degrees(mlon));
 	//printf ("Sun's longitude = %.8f\n", slon);
-	printf ("moon_long: Moon's longt after perturb fix is %f\n", mlon);
+	//printf ("moon_long: Moon's longt after perturb fix is %f\n", mlon);
 
 	int n;
 
 	//Calculate Tithi and Paksha
-	if (mlon<slon)
+	if (mlon<slon) {
 		mlon += 360.0;
-	printf ("Diff between Moons and Sun's longitudes = %.8f\n", mlon - slon);
-	n = (int) (((mlon-slon)/12.0) + 0.0025);
+		n = (int) (nround((rev(mlon-slon+0.07)/12.0), 3));
+	} else
+		n = (int) (nround((rev(mlon-slon)/12.0), 3));
+	//printf ("Diff between Moons and Sun's longitudes = %.8f\n", mlon - slon);
+	//printf ("Index of diff between Moons and Sun's longitudes = %.8f\n", (mlon - slon)/12.0);
 	strcpy(pdata->tithi,__g_tithi[n]);
-	printf ("Tithi index is n= %d -- %s\n", n, __g_tithi[n]);
+	//printf ("Tithi index is n= %d -- %s\n", n, __g_tithi[n]);
+	printf ("%s\n", __g_tithi[n]);
 	(n<=14)?strcpy(pdata->paksha,"Shukla"):strcpy(pdata->paksha,"Krishna");
 }
 
@@ -563,44 +501,164 @@ int main () {
 	//https://www.stjarnhimlen.se/comp/tutorial.html
 	
 	panchanga pdata;	
-	double srise, sset;
-	double sunhrs = sun_esrl (&srise, &sset, 
-					31, 10, 2019, 
-					5.5, 12.98889, 77.62210, 0); //Bangalore
-
-	//printf ("srise = %.15f\n", srise);
-	//printf ("sset = %.15f\n", sset);
-	printf ("srise = %02d:%02d\n", (int)floor(srise), (int)floor(fpart(srise)*60));
-	printf ("sset = %02d:%02d\n", (int)floor(sset), (int)floor(fpart(sset)*60));
-	//printf ("sunhrs = %.15f\n", sunhrs);
-	//
-	printf ("--------Alt--------\n");	
+	double srise, sset, sunhrs;
+	//printf ("-------------------\n");	
 	sunhrs = sun_esrl (&srise, &sset, 
 					31, 10, 2019, 
-					5.5, 12.98889, 77.62210, 1); //Bangalore
+					5.5, 12.98889, 77.62210); //Bangalore
 
-	printf ("srise = %02d:%02d\n", (int)floor(srise), (int)floor(fpart(srise)*60));
-	printf ("sset = %02d:%02d\n", (int)floor(sset), (int)floor(fpart(sset)*60));
+	//printf ("srise = %02d:%02d\n", (int)floor(srise), (int)floor(fpart(srise)*60));
+	//printf ("sset = %02d:%02d\n", (int)floor(sset), (int)floor(fpart(sset)*60));
+	//printf ("-------------------\n");	
 	//printf ("sunhrs = %.15f\n", sunhrs);
-	printf ("=======19, 4, 1990=========\n");	
-	calculate_tithi (19, 4, 1990, 5.5, 5.5, &pdata);
-	printf ("=======19, 4, 1990====radians=====\n");	
-	calculate_tithi_radians (19, 4, 1990, 5.5, 5.5, &pdata);
-	//printf ("======13, 10, 2019==========\n");	
-	//calculate_tithi (13, 10, 2019, 0.6, 5.5, &pdata);
-	//printf ("======13, 10, 2019==========\n");	
-	//calculate_tithi (13, 10, 2019, 0.7, 5.5, &pdata);
-	//printf ("======14, 10, 2019==========\n");	
-	//calculate_tithi (14, 10, 2019, 2.6166667, 5.5, &pdata);
-	//printf ("======15, 10, 2019==========\n");	
-	//calculate_tithi (15, 10, 2019, 4.33333333, 5.5, &pdata);
-	//printf ("======19, 10, 2019==========\n");	
-	//calculate_tithi (19, 10, 2019, 7.7166667, 5.5, &pdata);
-	//printf ("======20, 10, 2019==========\n");	
-	//calculate_tithi (20, 10, 2019, 7.483333, 5.5, &pdata);
-	//printf ("======20, 10, 2019==========\n");	
-	//calculate_tithi (20, 10, 2019, 7.4666667, 5.5, &pdata);
-	//printf ("======20, 10, 2019==========\n");	
-	//calculate_tithi (20, 10, 2019, 7.45, 5.5, &pdata);
+	//printf ("=======19, 4, 1990=========\n");	
+	//calculate_tithi (19, 4, 1990, 5.5, 5.5, &pdata);
+	//printf ("=======19, 4, 1990====radians=====\n");	
+	//calculate_tithi_radians (19, 4, 1990, 5.5, 5.5, &pdata);
+
+calculate_tithi_radians(   1 , 1, 2004, 6.35, 5.5, &pdata);
+calculate_tithi_radians(   2 , 1, 2004, 8.866666666666667, 5.5, &pdata);
+calculate_tithi_radians(   3 , 1, 2004, 11.616666666666667, 5.5, &pdata);
+calculate_tithi_radians(   4 , 1, 2004, 14.383333333333333, 5.5, &pdata);
+calculate_tithi_radians(   5 , 1, 2004, 16.966666666666665, 5.5, &pdata);
+calculate_tithi_radians(   6 , 1, 2004, 19.25, 5.5, &pdata);
+calculate_tithi_radians(   7 , 1, 2004, 21.166666666666668, 5.5, &pdata);
+calculate_tithi_radians(   8 , 1, 2004, 22.65, 5.5, &pdata);
+calculate_tithi_radians(   9 , 1, 2004, 23.716666666666665, 5.5, &pdata);
+calculate_tithi_radians(   11, 1, 2004, 0.38333333333333336, 5.5, &pdata);
+calculate_tithi_radians(   12, 1, 2004, 0.6333333333333333, 5.5, &pdata);
+calculate_tithi_radians(   13, 1, 2004, 0.48333333333333334, 5.5, &pdata);
+calculate_tithi_radians(   13, 1, 2004, 23.916666666666668, 5.5, &pdata);
+calculate_tithi_radians(   14, 1, 2004, 22.916666666666668, 5.5, &pdata);
+calculate_tithi_radians(   15, 1, 2004, 21.466666666666665, 5.5, &pdata);
+calculate_tithi_radians(   16, 1, 2004, 19.583333333333332, 5.5, &pdata);
+calculate_tithi_radians(   17, 1, 2004, 17.283333333333335, 5.5, &pdata);
+calculate_tithi_radians(   18, 1, 2004, 14.633333333333333, 5.5, &pdata);
+calculate_tithi_radians(   19, 1, 2004, 11.7, 5.5, &pdata);
+calculate_tithi_radians(   20, 1, 2004, 8.616666666666667, 5.5, &pdata);
+calculate_tithi_radians(   21, 1, 2004, 5.516666666666667, 5.5, &pdata);
+calculate_tithi_radians(   22, 1, 2004, 2.5666666666666664, 5.5, &pdata);
+calculate_tithi_radians(   22, 1, 2004, 23.95, 5.5, &pdata);
+calculate_tithi_radians(   23, 1, 2004, 21.8, 5.5, &pdata);
+calculate_tithi_radians(   24, 1, 2004, 20.316666666666666, 5.5, &pdata);
+calculate_tithi_radians(   25, 1, 2004, 19.6, 5.5, &pdata);
+calculate_tithi_radians(   26, 1, 2004, 19.733333333333334, 5.5, &pdata);
+calculate_tithi_radians(   27, 1, 2004, 20.7, 5.5, &pdata);
+calculate_tithi_radians(   28, 1, 2004, 22.45, 5.5, &pdata);
+calculate_tithi_radians(   30, 1, 2004, 0.7666666666666667, 5.5, &pdata);
+calculate_tithi_radians(   31, 1, 2004, 3.4333333333333336, 5.5, &pdata);
+calculate_tithi_radians(   1 , 2, 2004, 6.166666666666667, 5.5, &pdata);
+calculate_tithi_radians(   2 , 2, 2004, 8.716666666666667, 5.5, &pdata);
+calculate_tithi_radians(   3 , 2, 2004, 10.883333333333333, 5.5, &pdata);
+calculate_tithi_radians(   4 , 2, 2004, 12.566666666666666, 5.5, &pdata);
+calculate_tithi_radians(   5 , 2, 2004, 13.683333333333334, 5.5, &pdata);
+calculate_tithi_radians(   6 , 2, 2004, 14.266666666666667, 5.5, &pdata);
+calculate_tithi_radians(   7 , 2, 2004, 14.366666666666667, 5.5, &pdata);
+calculate_tithi_radians(   8 , 2, 2004, 14.05, 5.5, &pdata);
+calculate_tithi_radians(   9 , 2, 2004, 13.383333333333333, 5.5, &pdata);
+calculate_tithi_radians(   10, 2, 2004, 12.416666666666666, 5.5, &pdata);
+calculate_tithi_radians(   11, 2, 2004, 11.2, 5.5, &pdata);
+calculate_tithi_radians(   12, 2, 2004, 9.75, 5.5, &pdata);
+calculate_tithi_radians(   13, 2, 2004, 8.066666666666666, 5.5, &pdata);
+calculate_tithi_radians(   14, 2, 2004, 6.183333333333334, 5.5, &pdata);
+calculate_tithi_radians(   15, 2, 2004, 4.083333333333333, 5.5, &pdata);
+calculate_tithi_radians(   16, 2, 2004, 1.8333333333333335, 5.5, &pdata);
+calculate_tithi_radians(   16, 2, 2004, 23.45, 5.5, &pdata);
+calculate_tithi_radians(   17, 2, 2004, 21.05, 5.5, &pdata);
+calculate_tithi_radians(   18, 2, 2004, 18.716666666666665, 5.5, &pdata);
+calculate_tithi_radians(   19, 2, 2004, 16.583333333333332, 5.5, &pdata);
+calculate_tithi_radians(   20, 2, 2004, 14.783333333333333, 5.5, &pdata);
+calculate_tithi_radians(   21, 2, 2004, 13.466666666666667, 5.5, &pdata);
+calculate_tithi_radians(   22, 2, 2004, 12.766666666666667, 5.5, &pdata);
+calculate_tithi_radians(   23, 2, 2004, 12.766666666666667, 5.5, &pdata);
+calculate_tithi_radians(   24, 2, 2004, 13.516666666666667, 5.5, &pdata);
+calculate_tithi_radians(   25, 2, 2004, 14.983333333333333, 5.5, &pdata);
+calculate_tithi_radians(   26, 2, 2004, 17.066666666666666, 5.5, &pdata);
+calculate_tithi_radians(   27, 2, 2004, 19.566666666666666, 5.5, &pdata);
+calculate_tithi_radians(   28, 2, 2004, 22.216666666666665, 5.5, &pdata);
+calculate_tithi_radians(   1 , 3, 2004, 0.7666666666666667, 5.5, &pdata);
+calculate_tithi_radians(   2 , 3, 2004, 2.95, 5.5, &pdata);
+calculate_tithi_radians(   3 , 3, 2004, 4.583333333333333, 5.5, &pdata);
+calculate_tithi_radians(   4 , 3, 2004, 5.566666666666666, 5.5, &pdata);
+calculate_tithi_radians(   5 , 3, 2004, 5.9, 5.5, &pdata);
+calculate_tithi_radians(   6 , 3, 2004, 5.583333333333333, 5.5, &pdata);
+calculate_tithi_radians(   7 , 3, 2004, 4.733333333333333, 5.5, &pdata);
+calculate_tithi_radians(   8 , 3, 2004, 3.4333333333333336, 5.5, &pdata);
+calculate_tithi_radians(   9 , 3, 2004, 1.7833333333333332, 5.5, &pdata);
+calculate_tithi_radians(   9 , 3, 2004, 23.9, 5.5, &pdata);
+calculate_tithi_radians(   10, 3, 2004, 21.883333333333333, 5.5, &pdata);
+calculate_tithi_radians(   11, 3, 2004, 19.783333333333335, 5.5, &pdata);
+calculate_tithi_radians(   12, 3, 2004, 17.65, 5.5, &pdata);
+calculate_tithi_radians(   13, 3, 2004, 15.55, 5.5, &pdata);
+calculate_tithi_radians(   14, 3, 2004, 13.483333333333333, 5.5, &pdata);
+calculate_tithi_radians(   15, 3, 2004, 11.5, 5.5, &pdata);
+calculate_tithi_radians(   16, 3, 2004, 9.633333333333333, 5.5, &pdata);
+calculate_tithi_radians(   17, 3, 2004, 7.916666666666667, 5.5, &pdata);
+calculate_tithi_radians(   18, 3, 2004, 6.45, 5.5, &pdata);
+calculate_tithi_radians(   19, 3, 2004, 5.266666666666667, 5.5, &pdata);
+calculate_tithi_radians(   20, 3, 2004, 4.483333333333333, 5.5, &pdata);
+calculate_tithi_radians(   21, 3, 2004, 4.183333333333334, 5.5, &pdata);
+calculate_tithi_radians(   22, 3, 2004, 4.416666666666667, 5.5, &pdata);
+calculate_tithi_radians(   23, 3, 2004, 5.25, 5.5, &pdata);
+calculate_tithi_radians(   24, 3, 2004, 6.666666666666667, 5.5, &pdata);
+calculate_tithi_radians(   25, 3, 2004, 8.616666666666667, 5.5, &pdata);
+calculate_tithi_radians(   26, 3, 2004, 10.983333333333333, 5.5, &pdata);
+calculate_tithi_radians(   27, 3, 2004, 13.55, 5.5, &pdata);
+calculate_tithi_radians(   28, 3, 2004, 16.1, 5.5, &pdata);
+calculate_tithi_radians(   29, 3, 2004, 18.383333333333333, 5.5, &pdata);
+calculate_tithi_radians(   30, 3, 2004, 20.166666666666668, 5.5, &pdata);
+calculate_tithi_radians(   31, 3, 2004, 21.316666666666666, 5.5, &pdata);
+calculate_tithi_radians(   1 , 4, 2004, 21.716666666666665, 5.5, &pdata);
+calculate_tithi_radians(   2 , 4, 2004, 21.366666666666667, 5.5, &pdata);
+calculate_tithi_radians(   3 , 4, 2004, 20.333333333333332, 5.5, &pdata);
+calculate_tithi_radians(   4 , 4, 2004, 18.683333333333334, 5.5, &pdata);
+calculate_tithi_radians(   5 , 4, 2004, 16.533333333333335, 5.5, &pdata);
+calculate_tithi_radians(   6 , 4, 2004, 14.033333333333333, 5.5, &pdata);
+calculate_tithi_radians(   7 , 4, 2004, 11.3, 5.5, &pdata);
+calculate_tithi_radians(   8 , 4, 2004, 8.483333333333333, 5.5, &pdata);
+calculate_tithi_radians(   9 , 4, 2004, 5.666666666666667, 5.5, &pdata);
+calculate_tithi_radians(   10, 4, 2004, 2.966666666666667, 5.5, &pdata);
+calculate_tithi_radians(   11, 4, 2004, 0.4666666666666667, 5.5, &pdata);
+calculate_tithi_radians(   11, 4, 2004, 22.25, 5.5, &pdata);
+calculate_tithi_radians(   12, 4, 2004, 20.35, 5.5, &pdata);
+calculate_tithi_radians(   13, 4, 2004, 18.833333333333332, 5.5, &pdata);
+calculate_tithi_radians(   14, 4, 2004, 17.716666666666665, 5.5, &pdata);
+calculate_tithi_radians(   15, 4, 2004, 17.033333333333335, 5.5, &pdata);
+calculate_tithi_radians(   16, 4, 2004, 16.783333333333335, 5.5, &pdata);
+calculate_tithi_radians(   17, 4, 2004, 17.0, 5.5, &pdata);
+calculate_tithi_radians(   18, 4, 2004, 17.683333333333334, 5.5, &pdata);
+calculate_tithi_radians(   19, 4, 2004, 18.85, 5.5, &pdata);
+calculate_tithi_radians(   20, 4, 2004, 20.45, 5.5, &pdata);
+calculate_tithi_radians(   21, 4, 2004, 22.45, 5.5, &pdata);
+calculate_tithi_radians(   23, 4, 2004, 0.7833333333333333, 5.5, &pdata);
+calculate_tithi_radians(   24, 4, 2004, 3.3, 5.5, &pdata);
+calculate_tithi_radians(   25, 4, 2004, 5.85, 5.5, &pdata);
+calculate_tithi_radians(   26, 4, 2004, 8.233333333333333, 5.5, &pdata);
+calculate_tithi_radians(   27, 4, 2004, 10.233333333333333, 5.5, &pdata);
+calculate_tithi_radians(   28, 4, 2004, 11.683333333333334, 5.5, &pdata);
+calculate_tithi_radians(   29, 4, 2004, 12.433333333333334, 5.5, &pdata);
+calculate_tithi_radians(   30, 4, 2004, 12.433333333333334, 5.5, &pdata);
+calculate_tithi_radians(   1 , 5, 2004, 11.633333333333333, 5.5, &pdata);
+calculate_tithi_radians(   2 , 5, 2004, 10.1, 5.5, &pdata);
+calculate_tithi_radians(   3 , 5, 2004, 7.9, 5.5, &pdata);
+calculate_tithi_radians(   4 , 5, 2004, 5.183333333333334, 5.5, &pdata);
+calculate_tithi_radians(   5 , 5, 2004, 2.05, 5.5, &pdata);
+calculate_tithi_radians(   5 , 5, 2004, 22.666666666666668, 5.5, &pdata);
+calculate_tithi_radians(   6 , 5, 2004, 19.2, 5.5, &pdata);
+calculate_tithi_radians(   7 , 5, 2004, 15.766666666666667, 5.5, &pdata);
+calculate_tithi_radians(   8 , 5, 2004, 12.55, 5.5, &pdata);
+calculate_tithi_radians(   9 , 5, 2004, 9.65, 5.5, &pdata);
+calculate_tithi_radians(   10, 5, 2004, 7.2, 5.5, &pdata);
+calculate_tithi_radians(   11, 5, 2004, 5.3, 5.5, &pdata);
+calculate_tithi_radians(   12, 5, 2004, 3.9833333333333334, 5.5, &pdata);
+calculate_tithi_radians(   13, 5, 2004, 3.283333333333333, 5.5, &pdata);
+calculate_tithi_radians(   14, 5, 2004, 3.216666666666667, 5.5, &pdata);
+calculate_tithi_radians(   15, 5, 2004, 3.7333333333333334, 5.5, &pdata);
+calculate_tithi_radians(   16, 5, 2004, 4.783333333333333, 5.5, &pdata);
+calculate_tithi_radians(   17, 5, 2004, 6.283333333333333, 5.5, &pdata);
+calculate_tithi_radians(   18, 5, 2004, 8.166666666666666, 5.5, &pdata);
+
+printf ("-------------------\n");	
+
 }
 
