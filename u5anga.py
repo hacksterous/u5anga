@@ -1,4 +1,5 @@
 # (c) 2019 Anirban Banerjee
+#from u5anga import *; u = u5anga(5.5, 12.93340, 77.59630)
 #Licensed under:
 #GNU GENERAL PUBLIC LICENSE
 #Version 3, 29 June 2007
@@ -28,11 +29,11 @@ class u5anga ():
 	rashi = ["Mesha","Vrisha","Mithuna","Karka","Simha","Kanya","Tula",
 	   "Vrischika","Dhanu","Makara","Kumbha","Meena"]
 
-	vaara = ["Ravi","Soma","Mangal","Budh","Brihaspati","Shukra","Shani"]
+	vaaras = ["Ravi","Soma","Mangal","Budh","Brihaspati","Shukra","Shani"]
 
-	tithi = ["Prathamaa","Dvitiya","Tritiya","Chaturthi","Panchami",
+	tithis = ["Pratipad","Dvitiya","Tritiya","Chaturthi","Panchami",
 			"Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi",
-			"Dvadashi","Trayodashi","Chaturdashi","Purnima","Pratipada",
+			"Dvadashi","Trayodashi","Chaturdashi","Purnima","Pratipad",
 			"Dvitiya","Tritiya","Chaturthi","Panchami","Shashthi",
 			"Saptami","Ashtami","Navami","Dashami","Ekadashi","Dvadashi",
 			"Trayodashi","Chaturdashi","Amaavasya"]
@@ -40,68 +41,46 @@ class u5anga ():
 	karana = ["Bava","Baalava","Kaulava","Taitula","Garija","Vanija",
 	   "Vishti","Shakuni","Chatushpada","Naga","Kimstughna"]
 
-	yoga = ["Vishakumbha","Priti","Ayushman","Saubhagya","Shobhana",
+	yogas = ["Vishakumbha","Preeti","Ayushman","Saubhagya","Shobhana",
 	   "Atiganda","Sukarman","Dhriti","Shula","Ganda","Vriddhi",
 	   "Dhruva","Vyaghata","Harshana","Vajra","Siddhi","Vyatipata",
 	   "Variyan","Parigha","Shiva","Siddha","Saadhya","Shubha","Shukla",
 	   "Brahma","Indra","Vaidhriti"]
 
-	nakshatra = ["Ashvini","Bharani","Krittika","Rohini","Mrigashira","Ardra",
+	nakshatras = ["Ashvini","Bharani","Krittika","Rohini","Mrigashira","Ardra",
 			"Punarvasu","Pushya","Ashlesa","Magha","Purva Phalguni","Uttara Phalguni",
 			"Hasta","Chitra","Svaati","Vishakha","Anuradha","Jyeshtha","Mula",
 			"Purva Ashadha","Uttara Ashadha","Shravana","Dhanishtha","Shatabhisha",
 			"Purva Bhaadra","Uttara Bhaadra","Revati"]
 
-	def calc5 (self, dd, mm, yyyy, hr, zhr):
-		mp5anga.set_date(dd, mm, yyyy)
-		mp5anga.set_hour(hr, zhr)
-		
-		vaara = self.vaara[mp5anga.vaara()] 
-		t = mp5anga.tithi()
-		tithi = self.tithi[t]
-		paksha = "Shukla" if (t <= 14) else "Krishna"
-			
-		nakshatra = self.nakshatra[mp5anga.nakshatra()]
-		
-		yoga = self.yoga[mp5anga.yoga()]
-		
-		karana = self.karana[mp5anga.karana()]
-			
-		#Calculate the rashi in which the moon is present
-		rashi = self.rashi[mp5anga.rashi()]
+	def __init__ (self, zhr, latt, longt):
+		mp5anga.set_zone(zhr, latt, longt)
 
-		print(' Tithi: ' + tithi, '\n', paksha + ' paksha\n', vaara + 'vaara\n', 'Nakshatra: ' + nakshatra + '\n',\
-				'Yoga: ' + yoga + '\n',\
-				'Karana: ' + karana + '\n', 'Raashi: ' + rashi)
-		return
+	def mrashi (self, dd, mm, yyyy, hr):
+		print (self.rashi[mp5anga.vaara(mp5anga.ts_at_mn (dd, mm, yyyy) + (hr/24.0))])
 
-	def sun (self, dd, mm, yyyy, zhr, latt, longt):
-		if abs(latt) > 65:
-			print ("Error: cannot do latitudes beyond the Arctic/Antarctic Circles")
-			return 0.0
-		mp5anga.set_date(dd, mm, yyyy)
-		mp5anga.set_hour(-1, zhr) #set only time zone
+	def vaara (self, dd, mm, yyyy):
+		print (self.vaaras[mp5anga.vaara(mp5anga.ts_at_mn (dd, mm, yyyy))])
+
+	def ayanansha (self, dd, mm, yyyy, hr):
+		print ("ayanansha =", mp5anga.ayanansha(mp5anga.ts_at_mn (dd, mm, yyyy) + (hr/24.0)))
+
+	def nakshatra (self, dd, mm, yyyy, hr):
+		print ("nakshatra =", self.nakshatra[mp5anga.nakshatra(mp5anga.ts_at_mn (dd, mm, yyyy) + (hr/24.0))])
+		
+	def tithi (self, dd, mm, yyyy, hr):
+		timescale = mp5anga.ts_at_mn (dd, mm, yyyy) + (hr/24.0)
+		t = mp5anga.tithi(timescale)
+		#print ("tithi index t =", t)
+		print(' Tithi: ' + ("Shukla " if (t <= 14) else "Krishna ") + self.tithis[t])
+
+	def sun (self, dd, mm, yyyy):
 		#print ("sriseHr: ", sriseHr)
-		sriseHr = mpap(mp5anga.srise (latt, longt))
+		timescale = mp5anga.ts_at_mn (dd, mm, yyyy) + 2451544 #2451543.5 + 12/24 (at noon)
+		sun = mp5anga.sun(timescale).split(' ')
 		#print ("mpap sriseHr: ", sriseHr)
-		ssetHr = mpap(mp5anga.sset (latt, longt))
-		#print ("sun sets: ", ssetHr)
-		dayLightHours = mpap(mp5anga.shrs (latt, longt) / 60)
-		#print ("sun rises fracx60: ", sriseHr.frac()*60)
-		minutes = (sriseHr.frac()*60).roundstr(0)
-		#print ("minutes: ", minutes)
-		if len(minutes) == 1:
-			minutes = '0' + minutes
-		#print ("sun rises fracx60 roundstr0: ", (sriseHr.frac()*60).roundstr(0))
-		print (" Sunrise at: ", (str(sriseHr.floor()+1) if minutes == "60" else str(sriseHr.floor())) + ":" + ("00" if minutes == "60" else minutes))
-		minutes = (ssetHr.frac()*60).roundstr(0)
-		if len(minutes) == 1:
-			minutes = '0' + minutes
-		print (" Sunset at : ", (str(ssetHr.floor()+1) if minutes == "60" else str(ssetHr.floor())) + ":" + ("00" if minutes == "60" else minutes))
-		minutes = (dayLightHours.frac()*60).roundstr(0)
-		if len(minutes) == 1:
-			minutes = '0' + minutes
-		print (" Daylight hours:", str(dayLightHours.floor())+":"+ ("00" if minutes == "60" else minutes) +" minutes")
+		print (" Sunrise at: ", sun[0])
+		print (" Sunset at : ", sun[1])
+		print (" Daylight hours:", sun[2])
 
-		return sriseHr.float()
 
