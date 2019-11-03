@@ -21,6 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//https://farside.ph.utexas.edu/teaching/celestial/Celestialhtml/Celestialhtml.htmlhttps://farside.ph.utexas.edu/teaching/celestial/Celestialhtml/Celestialhtml.html
+
 #include "py/obj.h"
 #include "py/runtime.h"
 #include "py/builtin.h"
@@ -31,7 +33,7 @@
 #include <string.h>
 
 #ifndef M_PI
-#define M_PI 3.141592653
+#define M_PI 3.1415926535897932
 #endif
 
 #ifdef BARE_M
@@ -48,10 +50,6 @@
 #endif
 #define floatingpoint double
 
-#define D2R (M_PI/180.0)
-#define R2D (180.0/M_PI)
-#define REV(x)	((x)-floor((x)/360.0)*360.0)
-
 STATIC floatingpoint __mp5anga_zhr__ = 0.0;
 STATIC floatingpoint __mp5anga_latt__ = 0.0;
 STATIC floatingpoint __mp5anga_longt__ = 0.0;
@@ -61,11 +59,11 @@ floatingpoint rev(floatingpoint x) {
 }
 
 floatingpoint radians (floatingpoint degrees) {
-	return (3.14159265 * degrees / 180.0);
+	return (3.1415926535897932 * degrees / 180.0);
 }
 
 floatingpoint degrees (floatingpoint radians) {
-	return (180.0 * radians /3.14159265);
+	return (180.0 * radians /3.1415926535897932);
 }
 
 STATIC mp_obj_t  mp5anga_ts_at_mn(mp_obj_t odd, 
@@ -159,6 +157,22 @@ floatingpoint sun_esrl (floatingpoint* sunriseLSTp,
 							sin(2*radians(sun_geom_mean_anom_deg))); //V
 	//printf ("equation_of_time_min is %f\n", equation_of_time_min);
 	
+	double hour_angle_cosine = cos(radians(90.833))/(cos(radians(latt))*
+							cos(radians(sun_declination_deg)))-tan(radians(latt))*
+							tan(radians(sun_declination_deg));
+
+	if (hour_angle_cosine > 1.0) {
+		//sun never rises
+		*sunriseLSTp = 0.0;
+		*sunsetLSTp = 0.0;
+		return 0.0;
+	} else if (hour_angle_cosine < -1.0) {
+		//sun never sets
+		*sunriseLSTp = 0.0;
+		*sunsetLSTp = 0.0;
+		return 24.0;
+	}
+
 	floatingpoint hour_angle_sunrise_deg = degrees(acos(cos(radians(90.833))/(cos(radians(latt))*
 							cos(radians(sun_declination_deg)))-tan(radians(latt))*
 							tan(radians(sun_declination_deg)))); //W
@@ -205,14 +219,14 @@ floatingpoint calculate_moon_sun_long(floatingpoint d, floatingpoint* sLongp) {
 	//distance from Sun and true anomaly
 	//floatingpoint r = sqrt(x*x + y*y);	//in Earth radii
     floatingpoint v = atan2( y, x );		//true anomaly
-	floatingpoint slon = v + w;
-	//printf ("Sun's longitude = %.8f\n", rev(degrees(slon)));
+	floatingpoint slon = rev(degrees(v + w));
+	//printf ("Sun's longitude = %.8f\n", slon);
 
 	//------------------------------Moon
 	//all below are in radians
-	floatingpoint N = radians(rev(125.1228 - 0.0529538083  * d));   //Longt of ascending node
+	floatingpoint N = radians(rev(125.1228 - 0.0529538083 * d));   //Longt of ascending node
     const floatingpoint i = 0.089804;			//Inclination in degrees is 5.1454
-    w = radians(rev(318.0634 + 0.1643573223  * d));		//Arg. of perigee
+    w = radians(rev(318.0634 + 0.1643573223 * d));		//Arg. of perigee
     floatingpoint Mm = radians(rev(115.3654 + 13.0649929509 * d));  //Mean eccentricity anomaly
 
     const floatingpoint a = 60.2666; //Mean distance in Earth equatorial radii
@@ -221,10 +235,14 @@ floatingpoint calculate_moon_sun_long(floatingpoint d, floatingpoint* sLongp) {
 	//iterate for accurate eccentricity anomaly
 	E = Mm + e * sin(Mm) * (1 + e * cos(Mm));
 	floatingpoint eps;
+	int iter = 0;
 	do {
 		eps	= (E - e * sin(E) - Mm) / (1 - e * cos(E));
 		E = E - eps;
-	} while (eps > 0.001 || eps < -0.001);
+		if (iter > 50)
+			break;
+	} while (eps > 1e-5 || eps < -1e-5);
+
 	//compute rectangular (x,y) coordinates in the plane of the lunar orbit
 	x = a * (cos(E) - e);
     y = a * sqrt(1 - e*e) * sin(E);
@@ -236,7 +254,7 @@ floatingpoint calculate_moon_sun_long(floatingpoint d, floatingpoint* sLongp) {
     floatingpoint yeclip = r * (sin(N) * cos(v+w) + cos(N) * sin(v+w) * cos(i));
     //floatingpoint zeclip = r * sin(v+w) * sin(i);
 
-	floatingpoint mlon =  atan2(yeclip, xeclip);
+	floatingpoint mlon =  rev(degrees(atan2(yeclip, xeclip)));
     //floatingpoint latt  =  atan2(zeclip, sqrt( xeclip*xeclip + yeclip*yeclip));
     //r =  sqrt(xeclip*xeclip + yeclip*yeclip + zeclip*zeclip);
 
@@ -251,30 +269,30 @@ floatingpoint calculate_moon_sun_long(floatingpoint d, floatingpoint* sLongp) {
 	floatingpoint Lm = N + w + Mm;
 	floatingpoint D  = Lm - Ls;
 	floatingpoint F = Lm - N;
-	//printf ("Moon's longt before perturb fix is %f\n", rev(degrees(mlon)));
-	mlon += //in radians
-		-0.022235495 * sin(Mm - 2*D)	//Evection
-		+0.011484266 * sin(2*D)			//Variation
-		-0.003246312 * sin(Ms)			//Yearly equation
-		-0.001029744 * sin(2*Mm - 2*D)
-		-0.000994838 * sin(Mm - 2*D + Ms)
-		+0.000925025 * sin(Mm + 2*D)
-		+0.000802851 * sin(2*D - Ms)
-		+0.000715585 * sin(Mm - Ms)
-		-0.000610865 * sin(D)			//Parallactic equation
-		-4.3633231292e-5 * sin(D)		//Parallactic equation -- new term
-										//anirb's term actual val from https://en.wikipedia.org/wiki/Lunar_theory
-										//is 125" = 0.0375 degrees
-		-0.000541052 * sin(Mm + Ms)
-		-0.0002513274 * sin(2*F - 2*D)	//reduction to the ecliptic -- was 0.000261799    
-		+0.000191986 * sin(Mm - 4*D);
+	//printf ("Moon's longt before perturb fix is %f\n", mlon);
+	//printf ("Moon's uncorrected ecl. longitude = %.8f\n", mlon);
+	mlon += //in degrees
+		-1.27388888 * sin(Mm - 2*D)	//Evection -- stjarnhimlen gives -1.274
+		+0.65833333 * sin(2*D)		//Variation -- stjarnhimlen give +0.658
+		-0.185 * sin(Ms)			//Yearly equation -- stjarnhimlen gives -0.186, but
+									//[Chapront-Touzé and Chapront 1988] has 666 arc-seconds
+		-0.059 * sin(2*Mm - 2*D)
+		-0.057 * sin(Mm - 2*D + Ms)
+		+0.053 * sin(Mm + 2*D)
+		+0.046 * sin(2*D - Ms)
+		+0.041 * sin(Mm - Ms)
+		-0.034722222 * sin(D)		//Parallactic equation [Chapront-Touzé and Chapront 1988] has
+									//125 arc-seconds = 0.034722222
+									//http://www.stjarnhimlen.se/comp/tutorial.html has 0.035
+		-0.031 * sin(Mm + Ms)
+		-0.015 * sin(2*F - 2*D)		//reduction to the ecliptic from stjarnhimlen -- Wikipedia value is 0.0144
+									//stjarnhimlen has 0.015
+		+0.011 * sin(Mm - 4*D);
 	//printf ("Moon's longt after perturb fix in radians is %f\n", mlon);
 
-	slon = rev(degrees(slon));
 	*sLongp = slon;
-	mlon = rev(degrees(mlon));
-	printf ("Sun's longitude = %.8f\n", slon);
-	printf ("Moon's longitude = %.8f\n", mlon);
+	//printf ("Sun's ecl. longitude = %.8f\n", slon);
+	//printf ("Moon's ecl. longitude = %.8f\n", mlon);
 	return mlon;
 }
 
@@ -284,12 +302,8 @@ int calculate_tithi_index(floatingpoint d, floatingpoint div) {
    	mlon = calculate_moon_sun_long (d, &slon);
 
 	//Calculate Tithi and Paksha
-	//const floatingpoint fuzz = 0.04;
-	//if (mlon<slon) {
-	//	mlon += 360.0;
-	//	n = (int) (nround((rev(mlon-slon+fuzz)/div), 1000));
-	//} else
-		n = (int) (nround((rev(mlon-slon)/div), 100));
+	const floatingpoint fuzz = 0.03;
+	n = (int) (nround((rev(mlon-slon+fuzz)/div), 100000));
 	//printf ("Diff between Moons and Sun's longitudes = %.8f\n", mlon - slon);
 	//printf ("Index of diff between Moons and Sun's longitudes = %.8f and index = %d\n", (mlon - slon)/12.0, n);
 	//printf ("Tithi index is n= %d\n", n);
@@ -319,9 +333,10 @@ floatingpoint ayanansha(floatingpoint d) {
 
 STATIC mp_obj_t mp5anga_tithi (mp_obj_t od) {
 	floatingpoint d = mp_obj_get_float (od);
+	//printf ("mp5anga_tithi: d is %.8f\n", d);
 	int n = calculate_tithi_index (d, 12.0);	
 	#ifdef DEBUG
-	printf ("tithi index is %d\n", n);
+	//printf ("tithi index is %d\n", n);
 	#endif
 	return mp_obj_new_int(n%30);
 }
@@ -387,6 +402,10 @@ STATIC mp_obj_t mp5anga_sun (mp_obj_t od) {
 					__mp5anga_zhr__, 
 					__mp5anga_latt__, 
 					__mp5anga_longt__);
+	if (sunlightduration == 24.0)
+		return mp_obj_new_str("0 0 24", 6);
+	if (sunlightduration == 0.0)
+		return mp_obj_new_str("0 0 0", 5);
 	sprintf (s, "%02d:%02d:%02d %02d:%02d:%02d %02d:%02d:%02d", (int)srise, (int)(fpart(srise)*60), (int)nround(fpart(fpart(srise)*60)*60, 1000),
 					(int)sset, (int)(fpart(sset)*60), (int)nround(fpart(fpart(sset)*60)*60, 1000),
 					(int)sunlightduration, (int)(fpart(sunlightduration)*60), (int)nround(fpart(fpart(sunlightduration)*60)*60, 1000));

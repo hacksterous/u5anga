@@ -10,19 +10,6 @@ from math import *
 gc.enable()
 
 class u5anga ():
-	pi = mpap('3.1415926535897932')
-	pix2 = mpap('6.2831853071795865')
-	D2R = pi/180
-	R2D = mpap(180)/pi
-
-	Longitude = mpap(81.889)
-	Latitude = mpap(25.426)
-	Elevation = mpap(0)
-
-	Long = 81.889
-	Lat = 25.426
-	Elev = 0
-
 	month = ["January","February","March","April","May","June",
 	   "July","August","September","October","November","December"]
 
@@ -68,6 +55,61 @@ class u5anga ():
 	def nakshatra (self, dd, mm, yyyy, hr):
 		print ("nakshatra =", self.nakshatra[mp5anga.nakshatra(mp5anga.ts_at_mn (dd, mm, yyyy) + (hr/24.0))])
 		
+	def tithis_to_file (self, startyr, filename, howmany):
+		f = open(filename,"w")
+		self.list_tithis(startyr, f, howmany)
+		f.close()
+
+	def all_tithis (self, d, m, y):
+		#find all tithi changes starting at midnight on this date
+		oldtithi = ""
+		i = 0
+		for minutes in range(1440):
+			timescale = mp5anga.ts_at_mn (d, m, y) + (minutes/1440)
+			#print ("timescale is ", timescale)
+			tithi = self.tithis[mp5anga.tithi(timescale)]
+			if tithi != oldtithi:
+				newm = str(int(minutes%60))
+				if len(newm) < 2:
+					newm = "0"+newm
+				if oldtithi != "":
+					print (str(d)+"-"+str(m)+"-"+str(y)+" -> "+tithi+" starting "+str(int(minutes/60))+":"+newm)
+				oldtithi = tithi
+				i += 1
+
+	def list_tithis (self, startyr, fobj=None, howmany=1):
+		daylist = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+		i = 0
+		oldtithi = ""
+		while True:
+			y = 2001 + (startyr % 100)
+			for m in range(12):
+				for d in range(daylist[m]):
+					leapyr = (y % 4 == 0) and ((y % 100 != 0) or (y % 400 == 0))
+					for minutes in range(1440):
+						timescale = mp5anga.ts_at_mn (d+1, m+1, y) + (minutes/1440)
+						#print ("timescale is ", timescale)
+						tithi = self.tithis[mp5anga.tithi(timescale)]
+						if tithi != oldtithi:
+							if oldtithi != "":
+								newm = str(int(minutes%60))
+								if len(newm) < 2:
+									newm = "0"+newm
+								print (str(d+1)+"-"+str(m+1)+"-"+str(y)+","+str(int(minutes/60))+":"+newm+","+tithi)
+								if fobj != None:
+									fobj.write (str(d+1)+"-"+str(m+1)+"-"+str(y)+","+str(int(minutes/60))+":"+newm+","+tithi+"\n")
+							i += 1
+							if i >= howmany:
+								return
+							oldtithi = tithi
+					if m == 1 and d == 27 and not leapyr:
+						break
+					elif m == 1 and d == 28 and leapyr:
+						break
+					elif m == 11 and d == 30:
+						startyr += 1
+						break
+
 	def tithi (self, dd, mm, yyyy, hr):
 		timescale = mp5anga.ts_at_mn (dd, mm, yyyy) + (hr/24.0)
 		t = mp5anga.tithi(timescale)
@@ -79,8 +121,13 @@ class u5anga ():
 		timescale = mp5anga.ts_at_mn (dd, mm, yyyy) + 2451544 #2451543.5 + 12/24 (at noon)
 		sun = mp5anga.sun(timescale).split(' ')
 		#print ("mpap sriseHr: ", sriseHr)
-		print (" Sunrise at: ", sun[0])
-		print (" Sunset at : ", sun[1])
-		print (" Daylight hours:", sun[2])
+		if sun[2] == "0":
+			print ("No sunrise today.")
+		elif sun[2] == "24":
+			print ("No sunset today.")
+		else:
+			print (" Sunrise at: ", sun[0])
+			print (" Sunset at : ", sun[1])
+			print (" Daylight hours:", sun[2])
 
 

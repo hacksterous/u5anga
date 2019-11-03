@@ -202,6 +202,22 @@ double sun_esrl (double* sunriseLSTp,
 							sin(2*radians(sun_geom_mean_anom_deg))); //V
 	//printf ("equation_of_time_min is %.15f\n", equation_of_time_min);
 	
+	double hour_angle_cosine = cos(radians(90.833))/(cos(radians(latt))*
+							cos(radians(sun_declination_deg)))-tan(radians(latt))*
+							tan(radians(sun_declination_deg));
+
+	if (hour_angle_cosine > 1.0) {
+		//sun never rises
+		*sunriseLSTp = 0.0;
+		*sunsetLSTp = 0.0;
+		return 0.0;
+	} else if (hour_angle_cosine < -1.0) {
+		//sun never sets
+		*sunriseLSTp = 0.0;
+		*sunsetLSTp = 0.0;
+		return 24.0;
+	}
+
 	double hour_angle_sunrise_deg = degrees(acos(cos(radians(90.833))/(cos(radians(latt))*
 							cos(radians(sun_declination_deg)))-tan(radians(latt))*
 							tan(radians(sun_declination_deg)))); //W
@@ -249,7 +265,7 @@ void calculate_tithi_radians(int dd, int mm, int yy, double hr, double zhr, panc
 	//double r = sqrt(x*x + y*y);	//in Earth radii
     double v = atan2( y, x );		//true anomaly
 	double slon = v + w;
-	//printf ("Sun's longitude = %.8f\n", rev(degrees(slon)));
+	printf ("Sun's longitude = %.8f\n", rev(degrees(slon)));
 
 	//------------------------------Moon
 	//all below are in radians
@@ -294,7 +310,7 @@ void calculate_tithi_radians(int dd, int mm, int yy, double hr, double zhr, panc
 	double Lm = N + w + Mm;
 	double D  = Lm - Ls;
 	double F = Lm - N;
-	//printf ("moon_long: Moon's longt before perturb fix is %f\n", rev(degrees(mlon)));
+	printf ("moon_long: Moon's longt before perturb fix is %f\n", rev(degrees(mlon)));
 	mlon += //in radians
 		-0.022235495 * sin(Mm - 2*D)	//Evection
 		+0.011484266 * sin(2*D)			//Variation
@@ -315,20 +331,19 @@ void calculate_tithi_radians(int dd, int mm, int yy, double hr, double zhr, panc
 
 	slon = rev(degrees(slon));
 	mlon = rev(degrees(mlon));
+
+	printf ("Sun's ecl. longitude = %.8f\n", slon);
+	printf ("Moon's ecl. longitude = %.8f\n", mlon);
+
 	printf ("Sun's longitude = %.8f\n", slon);
 	printf ("moon_long: Moon's longt after perturb fix is %f\n", mlon);
 
 	int n;
 
 	//Calculate Tithi and Paksha
-	const double fuzz = 0.05;
-	if (mlon<slon) {
-		mlon += 360.0;
-		n = (int) (nround((rev(mlon-slon+fuzz)/12.0), 1000));
-	} else
-		n = (int) (nround((rev(mlon-slon)/12.0), 1000));
+	n = (int) (nround((rev(mlon-slon)/12.0), 1000));
 	printf ("Diff between Moons and Sun's longitudes = %.8f\n", mlon - slon);
-	printf ("Index of diff between Moons and Sun's longitudes = %.8f and index = %d\n", (mlon - slon)/12.0, n);
+	printf ("Index of diff between Moons and Sun's longitudes = %.8f and index = %d\n", rev(mlon - slon)/12.0, n);
 	strcpy(pdata->tithi,__g_tithi[n]);
 	//printf ("Tithi index is n= %d -- %s\n", n, __g_tithi[n]);
 	printf ("%s\n", __g_tithi[n]);
@@ -362,7 +377,7 @@ int main () {
 	//calculate_tithi_radians (14, 10, 2019, 2.566667, 5.5, &pdata);	//02:34
 	//calculate_tithi_radians (14, 10, 2019, 2.58333, 5.5, &pdata);	//02:35
 	//calculate_tithi_radians (14, 10, 2019, 2.6, 5.5, &pdata);		//02:36
-	calculate_tithi_radians (14, 10, 2019, 2.616667, 5.5, &pdata);	//02:37
+	calculate_tithi_radians (21, 10, 2019, 6.733333, 5.5, &pdata);
 	printf ("-------------------\n");	
 
 //calculate_tithi_radians(   1 , 1, 2004, 6.35, 5.5, &pdata);
