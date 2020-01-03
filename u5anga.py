@@ -77,27 +77,25 @@ class u5anga ():
 				oldtithi = tithi
 				i += 1
 
-	def list_tithis (self, startyr, fobj=None, howmany=1):
+	def list_tithis (self, startyr, howmany=1, fobj=None):
 		daylist = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 		i = 0
 		oldtithi = ""
 		while True:
-			y = 2001 + (startyr % 100)
 			for m in range(12):
 				for d in range(daylist[m]):
-					leapyr = (y % 4 == 0) and ((y % 100 != 0) or (y % 400 == 0))
+					leapyr = (startyr % 4 == 0) and ((startyr % 100 != 0) or (startyr % 400 == 0))
 					for minutes in range(1440):
-						timescale = mp5anga.ts_at_mn (d+1, m+1, y) + (minutes/1440)
-						#print ("timescale is ", timescale)
+						timescale = mp5anga.ts_at_mn (d+1, m+1, startyr) + (minutes/1440)
 						tithi = self.tithis[mp5anga.tithi(timescale)]
 						if tithi != oldtithi:
-							if oldtithi != "":
+							if oldtithi != "AA":
 								newm = str(int(minutes%60))
 								if len(newm) < 2:
 									newm = "0"+newm
-								print (str(d+1)+"-"+str(m+1)+"-"+str(y)+","+str(int(minutes/60))+":"+newm+","+tithi)
+								print (str(d+1)+"-"+str(m+1)+"-"+str(startyr)+","+str(int(minutes/60))+":"+newm+","+tithi)
 								if fobj != None:
-									fobj.write (str(d+1)+"-"+str(m+1)+"-"+str(y)+","+str(int(minutes/60))+":"+newm+","+tithi+"\n")
+									fobj.write (str(d+1)+"-"+str(m+1)+"-"+str(startyr)+","+str(int(minutes/60))+":"+newm+","+tithi+"\n")
 							i += 1
 							if i >= howmany:
 								return
