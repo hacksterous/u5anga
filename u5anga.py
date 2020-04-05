@@ -97,7 +97,7 @@ class u5anga ():
 							if fobj != None:
 								fobj.write (str(d+1)+"-"+str(m+1)+"-"+str(startyr)+","+str(int(minutes/60))+":"+newm+","+tithi+"\n")
 							i += 1
-							if i >= howmany:
+							if i > howmany:
 								return
 							oldtithi = tithi
 					if m == 1 and d == 27 and not leapyr:
