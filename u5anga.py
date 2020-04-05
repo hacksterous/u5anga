@@ -44,9 +44,10 @@ class u5anga ():
 		mp5anga.set_zone(zhr, latt, longt)
 
 	def mrashi (self, dd, mm, yyyy, hr):
-		print (self.rashi[mp5anga.vaara(mp5anga.ts_at_mn (dd, mm, yyyy) + (hr/24.0))])
+		print (self.rashi[mp5anga.rashi(mp5anga.ts_at_mn (dd, mm, yyyy) + (hr/24.0))])
 
 	def vaara (self, dd, mm, yyyy):
+		#print ("ts_at_mn=", mp5anga.ts_at_mn (dd, mm, yyyy))
 		print (self.vaaras[mp5anga.vaara(mp5anga.ts_at_mn (dd, mm, yyyy))])
 
 	def ayanansha (self, dd, mm, yyyy, hr):
