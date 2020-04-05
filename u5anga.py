@@ -89,13 +89,12 @@ class u5anga ():
 						timescale = mp5anga.ts_at_mn (d+1, m+1, startyr) + (minutes/1440)
 						tithi = self.tithis[mp5anga.tithi(timescale)]
 						if tithi != oldtithi:
-							if oldtithi != "AA":
-								newm = str(int(minutes%60))
-								if len(newm) < 2:
-									newm = "0"+newm
-								print (str(d+1)+"-"+str(m+1)+"-"+str(startyr)+","+str(int(minutes/60))+":"+newm+","+tithi)
-								if fobj != None:
-									fobj.write (str(d+1)+"-"+str(m+1)+"-"+str(startyr)+","+str(int(minutes/60))+":"+newm+","+tithi+"\n")
+							newm = str(int(minutes%60))
+							if len(newm) < 2:
+								newm = "0"+newm
+							print (str(d+1)+"-"+str(m+1)+"-"+str(startyr)+","+str(int(minutes/60))+":"+newm+","+tithi)
+							if fobj != None:
+								fobj.write (str(d+1)+"-"+str(m+1)+"-"+str(startyr)+","+str(int(minutes/60))+":"+newm+","+tithi+"\n")
 							i += 1
 							if i >= howmany:
 								return
